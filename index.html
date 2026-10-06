@@ -154,9 +154,9 @@ function site(){const i=cur,sc=T[i].scene;if(!sc)return;const last=T[i].tests[T[
 const PK=[['SYSTEM ALERT','#ff3b3b'],['VIRUS DETECTED','#ffd400'],['SECURITY BREACH','#ff3b3b'],['INCOMING MESSAGE','#00e5ff'],['SYSTEM UPDATE','#b388ff']];
 function popup(txt){if($('.pop'))return;const[tt,col]=rnd(PK),e=document.createElement('div');e.className='pop';e.style.setProperty('--pc',col);
  e.innerHTML='<div class="tb">■ '+tt+'</div><div class="bd">'+esc(txt.replace(/\{name\}/g,nm()))+'<div class="y" id="pi" style="margin-top:6px;font-weight:700"></div><button class="btn">[ ЗАКРЫТЬ ]</button></div>';
- document.body.appendChild(e);const b=e.querySelector('button'),ph=['Ага, поймай!','Слишком медленно!','Я быстрее твоего пинга!','Почти поймал...','Ладно, сдаюсь.'];let fl=0,armed=false;
+ document.body.appendChild(e);const b=e.querySelector('button'),ph=['Ага, поймай!','Слишком медленно!','Я быстрее твоего пинга!','Почти поймал...','Ладно, сдаюсь.'];let fl=0,armed=false;const lim=rnd([0,0,1,2,3,5]);
  const jump=()=>{e.style.left=Math.random()*Math.max(0,innerWidth-e.offsetWidth)+'px';e.style.top=(40+Math.random()*Math.max(0,innerHeight-e.offsetHeight-100))+'px'};jump();
- const flee=ev=>{if(fl<5){ev.preventDefault();$('#pi').textContent=ph[fl];fl++;click('back');jump();return true}return false};
+ const flee=ev=>{if(fl<lim){ev.preventDefault();$('#pi').textContent=ph[fl];fl++;click('back');jump();return true}return false};
  b.addEventListener('pointerdown',ev=>{if(!flee(ev))armed=true});b.addEventListener('pointerenter',ev=>{if(ev.pointerType==='mouse')flee(ev)});b.addEventListener('click',()=>{if(armed)e.remove()});setTimeout(()=>e.remove(),25000)}
 function startTimer(){clearInterval(popTimer);popTimer=setInterval(()=>{if(!$('#game').classList.contains('hide'))popup(rnd(D.jokes))},60000+Math.random()*90000)}
 /* ---------- эффекты ---------- */
