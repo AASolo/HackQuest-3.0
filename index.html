@@ -54,6 +54,9 @@ textarea{height:clamp(150px,30vh,300px)}
 @media (max-height:480px){h1{font-size:30px}.scr{padding-top:6px}#boot .wrap,#menu .wrap{padding-top:2vh!important}}
 @media (max-width:380px){.btn{padding:9px 10px;font-size:13px}.row{gap:6px}.big{font-size:13px;padding:12px}}
 .skip{position:fixed;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;color:#0b7a25;font-size:12px;z-index:55;pointer-events:none}
+.term{text-align:left;color:var(--g);border-color:var(--g);background:#021208;font-size:clamp(13px,3.9vw,19px);animation:pls 2s infinite}
+.term .pr{color:var(--c);display:block;margin-bottom:4px;font-size:.8em}.term .cur{animation:blk 1s steps(1) infinite}
+@keyframes blk{50%{opacity:0}}@keyframes pls{0%,100%{box-shadow:0 0 6px rgba(0,255,65,.3)}50%{box-shadow:0 0 22px rgba(0,255,65,.75)}}
 @media (prefers-reduced-motion:reduce){.glitch{animation:none}}
 </style></head><body>
 <canvas id="rain"></canvas>
@@ -61,7 +64,7 @@ textarea{height:clamp(150px,30vh,300px)}
 <div id="menu" class="scr hide"><div class="wrap" style="padding-top:8vh"><div class="card">
 <h1 class="glitch">HACKQUEST</h1><p class="c" style="text-align:center">// NEXUS CORP vs GHOST //</p>
 <p id="mst" style="text-align:center" class="y"></p><p id="story" class="hide"></p>
-<button class="btn big" id="bGo">&gt; ДОБРО ПОЖАЛОВАТЬ НА ТЁМНУЮ СТОРОНУ &lt;</button>
+<button class="btn big term" id="bGo"></button>
 <div class="row" style="justify-content:center"><button class="btn" id="bAbout">&gt; О МИССИИ</button><button class="btn" id="bNick">&gt; ПСЕВДОНИМ</button></div>
 <p class="dim" style="text-align:center">developed by KAPA // enter at your own risk</p></div></div></div>
 <div id="game" class="scr hide"><div class="wrap">
@@ -193,9 +196,12 @@ async function finale(x,W,H){
 function ask(cb){const m=$('#modal');m.classList.remove('hide');m.innerHTML='<div class="win" style="padding:18px"><b class="c" style="font-size:17px">НОВЫЙ ХАКЕР: придумай псевдоним</b><p class="dim">Под ним будут приходить шутки и уведомления</p><input id="ni" maxlength="20" value="'+esc(nick)+'"><div class="row"><button class="btn c" id="ng">&gt; ПРИДУМАТЬ ЗА МЕНЯ</button><button class="btn" id="nk">&gt; ГОТОВО</button></div></div>';
  $('#ng').onclick=()=>{$('#ni').value=rnd(D.nickA)+rnd(D.nickB)+'_'+String(1+Math.random()*98|0).padStart(2,'0');click('space')};
  const ok=()=>{nick=$('#ni').value.trim().slice(0,20)||'ghost_'+String(1+Math.random()*98|0).padStart(2,'0');LS.hq_nick=nick;m.classList.add('hide');refresh();cb&&cb()};$('#nk').onclick=ok;$('#ni').onkeydown=e=>{if(e.key==='Enter')ok()}}
-function toMenu(){$('#game').classList.add('hide');$('#menu').classList.remove('hide');refresh()}
+const CMD='sudo ./взлом_NEXUS.sh';let busy=false,cmdIv=null;
+function goBtn(){clearInterval(cmdIv);$('#bGo').innerHTML='<span class="pr">root@ghost:~#</span> <span id="cmd"></span><span class="cur">█</span>';let i=0;cmdIv=setInterval(()=>{const e=$('#cmd');if(!e||i>=CMD.length)return clearInterval(cmdIv);e.textContent=CMD.slice(0,++i)},70)}
+async function hackStart(){if(busy)return;busy=true;clearInterval(cmdIv);ac();for(const t of ['> проверка пароля ...','> обход защиты ... [OK]','ДОСТУП: ROOT']){$('#bGo').innerHTML='<span class="c">'+esc(t)+'</span>';click();await sleep(380)}busy=false;enter()}
+function toMenu(){$('#game').classList.add('hide');$('#menu').classList.remove('hide');refresh();goBtn()}
 function enter(){click('enter');ac();if(!mt)music();const go=()=>{$('#menu').classList.add('hide');$('#game').classList.remove('hide');show(done.size>=T.length?T.length-1:[...T.keys()].find(i=>!done.has(i)));startTimer();popup(rnd(D.welcome))};nick?go():ask(go)}
-let booted=false;async function boot(){const L=['HACKQUEST BIOS v1.337   (c) KAPA','CPU: GHOST-X9 @ 6.66 GHz ....... OK','RAM: 64 GB .................... OK','проверка защиты ............... ВЗЛОМ ОБНАРУЖЕН','загрузка ядра ................. OK','маскировка IP ................. OK','подключение к сети NEXUS CORP ...'],end=()=>{if(booted)return;booted=true;$('#boot').classList.add('hide');$('#menu').classList.remove('hide');refresh()};
+let booted=false;async function boot(){const L=['HACKQUEST BIOS v1.337   (c) KAPA','CPU: GHOST-X9 @ 6.66 GHz ....... OK','RAM: 64 GB .................... OK','проверка защиты ............... ВЗЛОМ ОБНАРУЖЕН','загрузка ядра ................. OK','маскировка IP ................. OK','подключение к сети NEXUS CORP ...'],end=()=>{if(booted)return;booted=true;$('#boot').classList.add('hide');$('#menu').classList.remove('hide');refresh();goBtn()};
  $('#boot').onclick=()=>{ac();end()};for(const l of L){if(booted)return;$('#bt').textContent+=l+'\n';await sleep(170)}for(let p=0;p<=100&&!booted;p+=4){$('#bi').style.width=p+'%';await sleep(40)}end()}
 /* ---------- фон «матрица» ---------- */
 (()=>{const c=$('#rain'),x=c.getContext('2d');let cols=[];const rs=()=>{c.width=innerWidth;c.height=innerHeight;cols=[...Array(Math.floor(c.width/18))].map(()=>Math.random()*c.height/18)};rs();addEventListener('resize',rs);
@@ -207,7 +213,7 @@ $('#sym').onclick=e=>{const s=e.target.dataset.s;if(s==null)return;const t=$('#c
 $('#code').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,a=t.selectionStart;t.value=t.value.slice(0,a)+'    '+t.value.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=a+4}click(e.key===' '?'space':e.key==='Enter'?'enter':e.key==='Backspace'?'back':e.key.length===1?'key':'none')});
 $('#code').addEventListener('focus',()=>setTimeout(()=>$('#code').scrollIntoView({block:'center',behavior:'smooth'}),350));
 const _c=click;click=function(k){if(k!=='none')_c(k)};
-$('#bGo').onclick=enter;$('#bAbout').onclick=()=>{$('#story').textContent=D.story;$('#story').classList.toggle('hide');$('#mst').classList.toggle('hide')};$('#bNick').onclick=()=>ask();
+$('#bGo').onclick=hackStart;$('#bAbout').onclick=()=>{$('#story').textContent=D.story;$('#story').classList.toggle('hide');$('#mst').classList.toggle('hide')};$('#bNick').onclick=()=>ask();
 $('#bRun').onclick=run;$('#bChk').onclick=check;$('#bHint').onclick=hint;$('#bSite').onclick=site;$('#bMenu').onclick=toMenu;$('#bNext').onclick=()=>show(cur+1);$('#bLog').onclick=()=>$('#log').classList.toggle('hide');
 $('#bSnd').onclick=()=>{sndOn=!sndOn;sndOn?music():clearInterval(mt);$('#bSnd').textContent=sndOn?'> SOUND':'> MUTED'};
 $('#bReset').onclick=()=>{const b=$('#bReset');if(b.textContent==='> СБРОС'){b.textContent='> ТОЧНО? ЕЩЁ РАЗ';setTimeout(()=>b.textContent='> СБРОС',3000)}else{b.textContent='> СБРОС';done.clear();codeOk.clear();siteOk.clear();siteIn={};save();show(0);toast('[!] ПРОГРЕСС СБРОШЕН\n    начни с первой миссии')}};
