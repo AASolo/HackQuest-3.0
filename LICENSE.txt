@@ -1,0 +1,11 @@
+HackQuest (c) 2026 KAPA. Все права защищены / All rights reserved.
+
+RU: Игра HackQuest (исходный код, задания, тексты, дизайн, звуки, веб-версия и приложение
+для Windows) является собственностью автора KAPA. Разрешено бесплатно играть. Запрещено без
+письменного разрешения автора: копировать, изменять, выкладывать код и материалы на других
+сайтах, распространять копии приложения, выдавать игру за свою, использовать в коммерческих целях.
+
+EN: HackQuest (source code, tasks, texts, design, sounds, the web version and the Windows app)
+is the property of its author, KAPA. You may play it for free. Without the author's written
+permission you may NOT copy, modify, republish the code or materials, redistribute copies of the
+app, present the game as your own, or use it commercially.
