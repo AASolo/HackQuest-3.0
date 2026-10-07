@@ -84,10 +84,12 @@ const D={"tasks": [{"lvl": "EASY", "title": "Первый контакт", "desc
 const $=s=>document.querySelector(s),T=D.tasks,XP={EASY:10,MEDIUM:25,HARD:50},LC={EASY:'#00ff41',MEDIUM:'#ffd400',HARD:'#ff3b3b'};
 const RANKS=[[0,'script_kiddie'],[40,'packet_sniffer'],[120,'code_ninja'],[250,'root_user'],[400,'elite_hacker']];
 const LS=(()=>{try{localStorage.setItem('t','1');return localStorage}catch(e){return{}}})(),KEY='hq_done_v4';
+const TTL=24*3600*1e3;let t0=+LS.hq_t0||0;if(t0&&Date.now()-t0>TTL){delete LS[KEY];delete LS.hq_t0;t0=0}
 let done=new Set(JSON.parse(LS[KEY]||'[]')),nick=LS.hq_nick||'',cur=0,hs=0,codeOk=new Set(),siteOk=new Set(),siteIn={},popTimer=null;
 const LAST={};T.forEach((t,i)=>LAST[t.lvl]=i);
 const xp=()=>[...done].reduce((a,i)=>a+XP[T[i].lvl],0),rank=()=>RANKS.filter(r=>xp()>=r[0]).pop()[1];
-const save=()=>{LS[KEY]=JSON.stringify([...done])},rnd=a=>a[Math.floor(Math.random()*a.length)],nm=()=>nick||'хакер';
+if(done.size&&!t0){t0=Date.now();LS.hq_t0=t0}
+const save=()=>{LS[KEY]=JSON.stringify([...done]);if(!done.size){delete LS.hq_t0;t0=0}else if(!t0){t0=Date.now();LS.hq_t0=t0}},rnd=a=>a[Math.floor(Math.random()*a.length)],nm=()=>nick||'хакер';
 const norm=s=>s.replace(/[\u201c\u201d]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/[\u00a0\u2009\u202f]/g,' ').replace(/[\u2013\u2014]/g,'-');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 /* ---------- звук: печатная машинка + трек ---------- */
@@ -167,7 +169,8 @@ function stuckNotice(){if($('.pop'))return;const e=document.createElement('div')
  e.innerHTML='<div class="tb">■ NEXUS // ТЫ ЗАСТРЯЛ?</div><div class="bd">'+esc(rnd(D.jokesHelp).replace(/\{name\}/g,nm()))+'<a class="hl" target="_blank" rel="noopener" href="help.html#'+(cur+1)+'">▶ ghost-help.net/m'+String(cur+1).padStart(2,'0')+' (открыть центр помощи)</a><button class="btn">[ я сам ]</button></div>';
  document.body.appendChild(e);e.style.left=Math.max(6,(innerWidth-e.offsetWidth)/2)+'px';e.style.top='56px';click('enter');
  e.querySelector('a').onclick=()=>setTimeout(()=>e.remove(),100);e.querySelector('button').onclick=()=>e.remove();setTimeout(()=>e.remove(),40000)}
-setInterval(()=>{if($('#game').classList.contains('hide')||document.hidden||!$('#modal').classList.contains('hide')){stuckT0+=5000;return}
+setInterval(()=>{if(done.size&&t0&&Date.now()-t0>TTL){done.clear();codeOk.clear();siteOk.clear();siteIn={};stuckShown.clear();save();show(0);toast('[!] ПРОГРЕСС УДАЛЁН\n    прошли сутки: начни заново')}
+ if($('#game').classList.contains('hide')||document.hidden||!$('#modal').classList.contains('hide')){stuckT0+=5000;return}
  if(!done.has(cur)&&!stuckShown.has(cur)&&(Date.now()-stuckT0>200000||fails>=4)){stuckShown.add(cur);stuckNotice()}},5000);
 function startTimer(){clearInterval(popTimer);popTimer=setInterval(()=>{if(!$('#game').classList.contains('hide'))popup(rnd(D.jokes))},60000+Math.random()*90000)}
 /* ---------- эффекты ---------- */
