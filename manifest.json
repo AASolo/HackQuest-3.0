@@ -25,5 +25,6 @@
    "type": "image/png",
    "purpose": "any"
   }
- ]
+ ],
+ "description": "Хакерская игра-тренажёр по Python: 30 миссий, взлом NEXUS CORP."
 }
